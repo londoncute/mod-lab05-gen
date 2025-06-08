@@ -1,45 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
+using System.IO;
 
-namespace generator
+class Program
 {
-    class CharGenerator 
+    static void Main()
     {
-        private string syms = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя"; 
-        private char[] data;
-        private int size;
-        private Random random = new Random();
-        public CharGenerator() 
-        {
-           size = syms.Length;
-           data = syms.ToCharArray(); 
-        }
-        public char getSym() 
-        {
-           return data[random.Next(0, size)]; 
-        }
-    }
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            CharGenerator gen = new CharGenerator();
-            SortedDictionary<char, int> stat = new SortedDictionary<char, int>();
-            for(int i = 0; i < 1000; i++) 
-            {
-               char ch = gen.getSym(); 
-               if (stat.ContainsKey(ch))
-                  stat[ch]++;
-               else
-                  stat.Add(ch, 1); Console.Write(ch);
-            }
-            Console.Write('\n');
-            foreach (KeyValuePair<char, int> entry in stat) 
-            {
-                 Console.WriteLine("{0} - {1}",entry.Key,entry.Value/1000.0); 
-            }
-            
-        }
+        Directory.CreateDirectory("Results");
+
+        var bigram = new BigramGenerator();
+        bigram.LoadFromFile("data/bigrams.csv");
+        var bigramText = bigram.Generate(1000);
+        File.WriteAllText("Results/gen-1.txt", bigramText);
+
+        var freqGen = new FrequencyWordGenerator();
+        freqGen.LoadFromFile("data/words.csv");
+        var wordText = freqGen.Generate(1000);
+        File.WriteAllText("Results/gen-2.txt", wordText);
+
+        Console.WriteLine("Генерация завершена.");
     }
 }
-
